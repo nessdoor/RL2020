@@ -99,21 +99,21 @@ begin
             );
 
     -- Generate registers and membership logic for each zone
-    zones: for a in 7 to 0 generate
-        signal local_base_a: STD_LOGIC_VECTOR (7 downto 0);
+    zones: for a in 7 downto 0 generate
+        signal local_base: STD_LOGIC_VECTOR (7 downto 0);
     begin
-        base_a: entity work.address_reg(rtl)
+        base: entity work.address_reg(rtl)
         port map(
                     clk => inv_clk,
                     rst => i_rst,
                     we => we_bus(a),
                     i_addr => i_data,
-                    o_addr => local_base_a
+                    o_addr => local_base
                 );
 
-        reg_bus((a * 8 + 7) downto (a * 8)) <= local_base_a;
-        active_zone(a) <= '1' when (UNSIGNED(input_address) >= UNSIGNED(local_base_a))
-                              and (UNSIGNED(input_address) < (UNSIGNED(local_base_a) + to_unsigned(4,8))) else
+        reg_bus((a * 8 + 7) downto (a * 8)) <= local_base;
+        active_zone(a) <= '1' when (UNSIGNED(input_address) >= UNSIGNED(local_base))
+                            and (UNSIGNED(input_address) < (UNSIGNED(local_base) + to_unsigned(4,8))) else
                           '0';
     end generate;
 

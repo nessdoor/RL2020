@@ -120,25 +120,25 @@ begin
     -- Select the base of the active zone, if the current address is inisde one
     with active_zone select
         base <= reg_bus(7 downto 0) when "00000001",
-                reg_bus(15 downto 8) when "0000001-",
-                reg_bus(23 downto 16) when "000001--",
-                reg_bus(31 downto 24) when "00001---",
-                reg_bus(39 downto 32) when "0001----",
-                reg_bus(47 downto 40) when "001-----",
-                reg_bus(55 downto 48) when "01------",
-                reg_bus(63 downto 56) when "1-------",
+                reg_bus(15 downto 8) when "00000010",
+                reg_bus(23 downto 16) when "00000100",
+                reg_bus(31 downto 24) when "00001000",
+                reg_bus(39 downto 32) when "00010000",
+                reg_bus(47 downto 40) when "00100000",
+                reg_bus(55 downto 48) when "01000000",
+                reg_bus(63 downto 56) when "10000000",
                 "--------" when others;
 
     -- Calculate the zone's number
     with active_zone select
         zone_number <= "000" when "00000001",
-                       "001" when "0000001-",
-                       "010" when "000001--",
-                       "011" when "00001---",
-                       "100" when "0001----",
-                       "101" when "001-----",
-                       "110" when "01------",
-                       "111" when "1-------",
+                       "001" when "00000010",
+                       "010" when "00000100",
+                       "011" when "00001000",
+                       "100" when "00010000",
+                       "101" when "00100000",
+                       "110" when "01000000",
+                       "111" when "10000000",
                        "---" when others;
 
     -- Calculate offset from the WZ's base address

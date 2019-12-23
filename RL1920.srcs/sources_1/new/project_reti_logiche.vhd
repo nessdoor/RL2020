@@ -149,7 +149,7 @@ begin
 
     -- Check if WZ encoding has taken place
     with active_zone select
-        is_encoded <= '0' when (others => '0'),
+        is_encoded <= '0' when "00000000",
                       '1' when others;
 
     -- If address has been encoded, output it, otherwise copy the input to the output
@@ -157,30 +157,35 @@ begin
               input_address;
 
     state_output: process (i_clk, i_rst)
+    begin
+        if i_rst = '1' then
+            currs <= R;
+            curr_mem_addr <= (others => '0');
+            o_address <= (others => '0');
+        elsif i_clk'event and i_clk = '0' then
+            currs <= nexs;
+            curr_mem_addr <= new_mem_addr;
+            o_address <= STD_LOGIC_VECTOR(new_mem_addr);
+        end if;
+    end process state_output;
+
+    -- Generates WE signals for the internal registers based on the current memory address
+    we_sigs_phaser: process (i_clk, i_rst)
         -- Support variable to compute new write-enable signals for internatl registers
         variable new_we_sigs:STD_LOGIC_VECTOR (9 downto 0);
     begin
         new_we_sigs := (others => '0');
 
         if i_rst = '1' then
-            currs <= R;
-            curr_mem_addr <= (others => '0');
             we_bus <= (others => '0');
-            o_address <= (others => '0');
-        elsif i_clk'event then
-            if i_clk = '0' then
-                currs <= nexs;
-                curr_mem_addr <= new_mem_addr;
-                o_address <= STD_LOGIC_VECTOR(new_mem_addr);
-            else
-                -- Based on the current memort address, set the write-enable signal of the correct register.
-                -- new_we_sigs has an extra bit because curr_mem_addr is used for pointing to the
-                -- result-cell's address too.
-                new_we_sigs(to_integer(curr_mem_addr)) := '1';
-                we_bus <= new_we_sigs(8 downto 0);
-            end if;
+        elsif i_clk'event and i_clk = '1' then
+            -- Based on the current memort address, set the write-enable signal of the correct register.
+            -- new_we_sigs has an extra bit because curr_mem_addr is used for pointing to the
+            -- result-cell's address too.
+            new_we_sigs(to_integer(curr_mem_addr)) := '1';
+            we_bus <= new_we_sigs(8 downto 0);
         end if;
-    end process state_output;
+    end process we_sigs_phaser;
 
     -- Raise signal when base addresses are loaded
     wz_loaded <= '1' when curr_mem_addr >= to_unsigned(7, 15) else

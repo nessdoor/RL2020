@@ -82,7 +82,7 @@ architecture Behavioral of project_reti_logiche is
     return STD_LOGIC_VECTOR is
         variable offoh: STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
     begin
-        offoh(to_integer(i)) := '1';
+        offoh(to_integer(i(1 downto 0))) := '1';
         return offoh;
     end offset_to_oh;
 

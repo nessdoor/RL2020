@@ -186,6 +186,7 @@ begin
             --
         end loop;
 
+        report "All tests succesfully completed ";
         std.env.stop;
     end process;
 end unitb_arch;

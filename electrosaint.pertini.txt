@@ -1,6 +1,6 @@
 # Time | RST | START | OVERRIDE | ADDR | DATA
 # T     R S O A    D
- 100 ns 1 0 0 0000 00
+ 100 ns 1 0 0 0000 00 # Loading memory layout for common testbenches
  100 ns 0 0 1 0000 04
  100 ns 0 0 1 0001 0D
  100 ns 0 0 1 0002 16
@@ -9,71 +9,71 @@
  100 ns 0 0 1 0005 2D
  100 ns 0 0 1 0006 4D
  100 ns 0 0 1 0007 5B
- 100 ns 0 0 1 0008 2A
+ 100 ns 0 0 1 0008 2A # Common test 1
  100 ns 0 0 1 000A 2A
  100 ns 1 0 0 0000 00
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 21
+ 100 ns 0 0 1 0008 21 # Common test 2
  100 ns 0 0 1 000A B4
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 25
+ 100 ns 0 0 1 0008 25 # Testing zone lower boundary
  100 ns 0 0 1 000A C1
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 28
+ 100 ns 0 0 1 0008 28 # Testing lower zone upper boundary: included
  100 ns 0 0 1 000A C8
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 29
+ 100 ns 0 0 1 0008 29 # Testing lower zone upper boundary: excluded, between two zones
  100 ns 0 0 1 000A 29
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 2D
+ 100 ns 0 0 1 0008 2D # Testing upper zone lower boundary
  100 ns 0 0 1 000A D1
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 00
+ 100 ns 0 0 1 0008 00 # Testing lower memory boundary
  100 ns 0 0 1 000A 00
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 7F
+ 100 ns 0 0 1 0008 7F # Testing upper memory boundary
  100 ns 0 0 1 000A 7F
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 03
+ 100 ns 0 0 1 0008 03 # Testing address 03 before layout change (excluded)
  100 ns 0 0 1 000A 03
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0000 00
+ 100 ns 0 0 1 0000 00 # Changing layout: adding zone 0-3, zone 124-127; moving zone 4-7; deleting zone 13-16
  100 ns 0 0 1 0001 04
  100 ns 0 0 1 0007 7C
- 100 ns 0 0 1 000A 88
+ 100 ns 0 0 1 000A 88 # Testing address 03 after layout change (included), with adjacent zone following it
  100 ns 1 0 0 0000 00
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 04
+ 100 ns 0 0 1 0008 04 # Testing lower zone boundary, with adjacent zone preceding it
  100 ns 0 0 1 000A 91
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 00
+ 100 ns 0 0 1 0008 00 # Testing lower memory boundary, after layout change
  100 ns 0 0 1 000A 81
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
- 100 ns 0 0 1 0008 7F
+ 100 ns 0 0 1 0008 7F # Testing upper memory boundary, after layout change
  100 ns 0 0 1 000A F8
  100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00

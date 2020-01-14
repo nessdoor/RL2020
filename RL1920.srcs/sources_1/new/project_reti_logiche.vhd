@@ -179,7 +179,7 @@ begin
         if i_rst = '1' then
             we_bus <= (others => '0');
         elsif i_clk'event and i_clk = '1' then
-            -- Based on the current memort address, set the write-enable signal of the correct register.
+            -- Based on the current memory address, set the write-enable signal of the correct register.
             -- new_we_sigs has an extra bit because curr_mem_addr is used for pointing to the
             -- result-cell's address too.
             new_we_sigs(to_integer(curr_mem_addr)) := '1';

@@ -124,3 +124,13 @@ V
  1 ns 0 0 0 0000 00 # Test reproducibility immediately after previous run
  1 ns 0 1 0 0000 00
 V
+ 100 ns 1 0 0 0000 00 # Test reset: before new WE signals get generated
+ 425 ns 0 1 0 0000 00
+ 5 ns 1 1 0 0000 00
+ 0 ns 0 1 0 0000 00
+V
+ 100 ns 1 0 0 0000 00 # Test reset: after new WE signals get generated
+ 475 ns 0 1 0 0000 00
+ 5 ns 1 1 0 0000 00
+ 0 ns 0 1 0 0000 00
+V

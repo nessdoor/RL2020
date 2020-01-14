@@ -1,18 +1,18 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Politecnico di Milano
+-- Engineer: Tomas Antonio Lopez
 -- 
 -- Create Date: 12/15/2019 02:48:03 PM
--- Design Name: 
+-- Design Name: RL1920
 -- Module Name: project_reti_logiche - Behavioral
--- Project Name: 
--- Target Devices: 
--- Tool Versions: 
--- Description: 
+-- Project Name: Progetto Reti Logiche
+-- Target Devices: xc7a200tfbg484-1
+-- Tool Versions: 2018.3
+-- Description: Component for this year's assignment
 -- 
--- Dependencies: 
+-- Dependencies: None
 -- 
--- Revision:
+-- Revision: 1.0 - Tested and functional
 -- Revision 0.01 - File Created
 -- Additional Comments:
 -- 

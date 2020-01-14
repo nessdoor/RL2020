@@ -12,6 +12,7 @@
 -- 
 -- Dependencies: None
 -- 
+-- Revision: 1.1 - Moved wz_loaded logic inside delta process
 -- Revision: 1.0 - Tested and functional
 -- Revision 0.01 - File Created
 -- Additional Comments:
@@ -66,7 +67,6 @@ architecture Behavioral of project_reti_logiche is
     signal input_address: STD_LOGIC_VECTOR (7 downto 0);
     signal new_mem_addr: UNSIGNED (15 downto 0);
     signal curr_mem_addr: UNSIGNED (15 downto 0);
-    signal wz_loaded: STD_LOGIC;
 
     signal we_bus: STD_LOGIC_VECTOR (8 downto 0);
     signal reg_bus: STD_LOGIC_VECTOR (63 downto 0);
@@ -187,11 +187,7 @@ begin
         end if;
     end process we_sigs_phaser;
 
-    -- Raise signal when base addresses are loaded
-    wz_loaded <= '1' when curr_mem_addr >= to_unsigned(7, 15) else
-                 '0';
-
-    delta: process (currs, i_start, wz_loaded)
+    delta: process (currs, i_start, curr_mem_addr)
     begin
         case currs is
             when R =>
@@ -203,7 +199,8 @@ begin
             when LZ1 =>
                 nexs <= LZ2;
             when LZ2 =>
-                if wz_loaded = '1' then
+                -- Start encoding when base addresses are loaded
+                if curr_mem_addr >= to_unsigned(7, 15) then
                     nexs <= LA;
                 else
                     nexs <= LZ1;

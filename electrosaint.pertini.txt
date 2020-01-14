@@ -17,102 +17,82 @@
 V
  100 ns 0 0 1 0008 21 # Common test 2
  100 ns 0 0 1 000A B4
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 04 # Start full sweep (first address, all zones): Zone 0
  100 ns 0 0 1 000A 81
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 0D # Zone 1
  100 ns 0 0 1 000A 91
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 16 # Zone 2
  100 ns 0 0 1 000A A1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 1F # Zone 3
  100 ns 0 0 1 000A B1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 25 # Zone 4
  100 ns 0 0 1 000A C1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 2D # Zone 5
  100 ns 0 0 1 000A D1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 4D # Zone 6
  100 ns 0 0 1 000A E1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 5B # Zone 7
  100 ns 0 0 1 000A F1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 04 # Start full sweep (all addresses, zone 0): Address 4
  100 ns 0 0 1 000A 81
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 05 # Address 5
  100 ns 0 0 1 000A 82
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 06 # Address 6
  100 ns 0 0 1 000A 84
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 07 # Address 7
  100 ns 0 0 1 000A 88
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 25 # Testing zone lower boundary
  100 ns 0 0 1 000A C1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 28 # Testing lower zone upper boundary: included
  100 ns 0 0 1 000A C8
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 29 # Testing lower zone upper boundary: excluded, between two zones
  100 ns 0 0 1 000A 29
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 2D # Testing upper zone lower boundary
  100 ns 0 0 1 000A D1
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 00 # Testing lower memory boundary
  100 ns 0 0 1 000A 00
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 7F # Testing upper memory boundary
  100 ns 0 0 1 000A 7F
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 03 # Testing address 03 before layout change (excluded)
  100 ns 0 0 1 000A 03
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0000 00 # Changing layout: adding zone 0-3, zone 124-127; moving zone 4-7; deleting zone 13-16
@@ -125,16 +105,13 @@ V
 V
  100 ns 0 0 1 0008 04 # Testing lower zone boundary, with adjacent zone preceding it
  100 ns 0 0 1 000A 91
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 00 # Testing lower memory boundary, after layout change
  100 ns 0 0 1 000A 81
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V
  100 ns 0 0 1 0008 7F # Testing upper memory boundary, after layout change
  100 ns 0 0 1 000A F8
- 100 ns 0 0 0 0000 00
  100 ns 0 1 0 0000 00
 V

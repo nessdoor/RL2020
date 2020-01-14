@@ -2,3 +2,7 @@
 RL1920.cache/
 RL1920.hw/
 RL1920.ip_user_files/
+RL1920.runs/
+RL1920.sim/
+RL1920.xpr
+project_tb_behav.wcfg

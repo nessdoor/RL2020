@@ -115,3 +115,12 @@ V
  100 ns 0 0 1 000A F8
  100 ns 0 1 0 0000 00
 V
+ 100 ns 0 0 1 0008 0D # Alter and verify zone 0 under anticipated start signal
+ 100 ns 0 0 1 000A 81
+ 100 ns 0 0 1 0000 0D
+ 75 ns 1 0 0 0000 00
+ 0 ns 0 1 0 0000 00
+V
+ 1 ns 0 0 0 0000 00 # Test reproducibility immediately after previous run
+ 1 ns 0 1 0 0000 00
+V

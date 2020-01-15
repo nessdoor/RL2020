@@ -134,8 +134,20 @@ begin
             -- See if we reached a verification checkpoint
             read(text_line, char, ok);
             if char = 'V' then
+                read(text_line, char, ok); -- Read blank
+                hread(text_line, expected_output, ok);
+                assert ok report "Read 'expected_output' failed for line: " &
+                 text_line.all severity failure;
+
                 -- When 'done' is signaled by the UUT, check results
                 wait until tb_done = '1';
+
+                assert RAM(9) = RAM(10) report "TEST FAILED. Expected " &
+                 integer'image(to_integer(unsigned(RAM(10)))) &
+                 ", found " &
+                 integer'image(to_integer(unsigned(RAM(9)))) &
+                 "." severity failure;
+
                 wait for c_CLOCK_PERIOD;
                 tb_start <= '0';
                 wait until tb_done = '0';

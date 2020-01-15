@@ -121,6 +121,7 @@ begin
         variable activate_internal: std_logic;
         variable address: std_logic_vector (15 downto 0);
         variable data: std_logic_vector (7 downto 0);
+        variable expected_output: std_logic_vector (7 downto 0);
     begin
         while not endfile(text_file) loop
             readline(text_file, text_line);
@@ -142,8 +143,8 @@ begin
                 -- When 'done' is signaled by the UUT, check results
                 wait until tb_done = '1';
 
-                assert RAM(9) = RAM(10) report "TEST FAILED. Expected " &
-                 integer'image(to_integer(unsigned(RAM(10)))) &
+                assert RAM(9) = expected_output report "TEST FAILED. Expected " &
+                 integer'image(to_integer(unsigned(expected_output))) &
                  ", found " &
                  integer'image(to_integer(unsigned(RAM(9)))) &
                  "." severity failure;
@@ -152,8 +153,8 @@ begin
                 tb_start <= '0';
                 wait until tb_done = '0';
 
-                assert RAM(9) = RAM(10) report "TEST FAILED. Expected " &
-                 integer'image(to_integer(unsigned(RAM(10)))) &
+                assert RAM(9) = expected_output report "TEST FAILED. Expected " &
+                 integer'image(to_integer(unsigned(expected_output))) &
                  ", found " &
                  integer'image(to_integer(unsigned(RAM(9)))) &
                  "." severity failure;

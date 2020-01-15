@@ -159,6 +159,9 @@ begin
                  integer'image(to_integer(unsigned(RAM(9)))) &
                  "." severity failure;
 
+                 -- Synchronize bench to falling edge, so that we always know where we are
+                 wait until tb_clk'event and tb_clk = '0';
+
                  next;
             end if;
             --

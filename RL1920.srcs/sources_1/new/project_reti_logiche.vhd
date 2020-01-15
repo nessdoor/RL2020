@@ -78,6 +78,8 @@ architecture Behavioral of project_reti_logiche is
     signal encoded_addr: STD_LOGIC_VECTOR (7 downto 0);
     signal is_encoded: STD_LOGIC;
 
+    signal sync_o_done: STD_LOGIC;
+
     function offset_to_oh (i: UNSIGNED (7 downto 0))
     return STD_LOGIC_VECTOR is
         variable offoh: STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
@@ -169,6 +171,16 @@ begin
         end if;
     end process state_output;
 
+    -- Synchronize o_done on the rising edge to avoid glitches
+    sync_done: process (i_clk, i_rst)
+    begin
+        if i_rst = '1' then
+            o_done <= '0';
+        elsif i_clk'event and i_clk = '1' then
+            o_done <= sync_o_done;
+        end if;
+    end process sync_done;
+
     -- Generates WE signals for the internal registers based on the current memory address
     we_sigs_phaser: process (i_clk, i_rst)
         -- Support variable to compute new write-enable signals for internatl registers
@@ -229,37 +241,37 @@ begin
         case currs is
             when R =>
                 new_mem_addr <= (others => '0');
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '0';
                 o_we <= '-';
             when LZ1 =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when LZ2 =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when LA =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when WA =>
                 new_mem_addr <= to_unsigned(8, 16);
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '1';
                 o_we <= '1';
             when D =>
                 new_mem_addr <= curr_mem_addr;
-                o_done <= '1';
+                sync_o_done <= '1';
                 o_en <= '0';
                 o_we <= '-';
             when S =>
                 new_mem_addr <= curr_mem_addr;
-                o_done <= '0';
+                sync_o_done <= '0';
                 o_en <= '0';
                 o_we <= '-';
         end case;

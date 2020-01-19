@@ -1,3 +1,4 @@
+from sys import argv
 from random import seed, randrange
 from typing import Collection, Sequence, List
 
@@ -70,18 +71,26 @@ def generate_pause() -> str:
 
 if __name__ == '__main__':
     seed()
-    wzs = generate_test_zones(8)
-    inputs = generate_test_inputs(wzs)
+    iterations = 1
 
-    for z in wzs:
-        print(generate_wz(wzs.index(z), z))
-    
-    print(generate_input(inputs[-1]))
-    print(generate_reset())
-    print(generate_start())
-    print(generate_checkpoint(encode_address(wzs, inputs.pop())))
+    if len(argv) > 1:
+        iterations = int(argv[1])
 
-    for i in inputs:
-        print(generate_input(i))
+    for i in range(0, iterations):
+        print("# Iteration: " + str(i))
+
+        wzs = generate_test_zones(8)
+        inputs = generate_test_inputs(wzs)
+
+        for z in wzs:
+            print(generate_wz(wzs.index(z), z))
+
+        print(generate_input(inputs[-1]))
+        print(generate_reset())
         print(generate_start())
-        print(generate_checkpoint(encode_address(wzs, i)))
+        print(generate_checkpoint(encode_address(wzs, inputs.pop())))
+
+        for i in inputs:
+            print(generate_input(i))
+            print(generate_start())
+            print(generate_checkpoint(encode_address(wzs, i)))

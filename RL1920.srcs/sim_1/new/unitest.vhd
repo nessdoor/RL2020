@@ -111,7 +111,7 @@ begin
     end process;
 
     SEQUENCER: process
-        file text_file: text open read_mode is "/home/tlopez/Devel/Hardware/RL1920/electrosaint.pertini.txt";
+        file text_file: text open read_mode is "/home/tlopez/Devel/Hardware/RL1920/tests/electrosaint.pertini.txt";
         variable text_line: line;
         variable ok: boolean;
         variable char: character;

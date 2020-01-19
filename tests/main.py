@@ -6,9 +6,9 @@ def generate_test_zones(quantity: int) -> List[int]:
     zones = list()
     covered_addresses = set()
     while len(zones) < quantity:
-        candidate = randrange(0, 128)
+        candidate = randrange(0, 125)
 
-        if candidate not in covered_addresses:
+        if {candidate, candidate + 3}.isdisjoint(covered_addresses):
             zones.append(candidate)
             
             for a in range(candidate, candidate + 4):
@@ -24,7 +24,7 @@ def generate_test_inputs(zones: Collection[int]) -> List[int]:
     input_set.add(1)
     
     for wz in zones:
-        for address in range(wz - 2, wz + 2):
+        for address in range(wz - 2, wz + 3):
             if 0 <= address <= 127:
                 input_set.add(address)
 

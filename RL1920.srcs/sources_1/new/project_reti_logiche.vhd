@@ -76,7 +76,6 @@ architecture Behavioral of project_reti_logiche is
     signal offset: UNSIGNED (7 downto 0);
     signal zone_number: STD_LOGIC_VECTOR (2 downto 0);
     signal encoded_addr: STD_LOGIC_VECTOR (7 downto 0);
-    signal is_encoded: STD_LOGIC;
 
     signal sync_o_done: STD_LOGIC;
 
@@ -149,14 +148,11 @@ begin
     -- Stitch toghether the encoded address
     encoded_addr <= '1' & zone_number & offset_to_oh(offset);
 
-    -- Check if WZ encoding has taken place
+    -- Check if WZ encoding has taken place.
+    -- If that's the case, output the encoded address, otherwise copy the input to the output
     with active_zone select
-        is_encoded <= '0' when "00000000",
-                      '1' when others;
-
-    -- If address has been encoded, output it, otherwise copy the input to the output
-    o_data <= encoded_addr when is_encoded = '1' else
-              input_address;
+        o_data <= input_address when "00000000",
+                  encoded_addr when others;
 
     state_output: process (i_clk, i_rst)
     begin

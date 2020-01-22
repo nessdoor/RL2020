@@ -2,7 +2,11 @@
 RL1920.cache/
 RL1920.hw/
 RL1920.ip_user_files/
-RL1920.runs/
+RL1920.runs/synth_1/*
+RL1920.runs/impl_1/
+RL1920.runs/.jobs/
 RL1920.sim/
 RL1920.xpr
 project_tb_behav.wcfg
+
+!RL1920.runs/synth_1/project_reti_logiche.vds

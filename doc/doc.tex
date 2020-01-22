@@ -19,8 +19,71 @@
 \newpage
 
 \section{Introduzione}
+Il componente richiesto consiste in un \emph{working-zone encoder} per indirizzi a 7 bit, con output a 8 bit.\\
+Al primo segnale di \emph{start} dopo un \emph{reset}, il componente carica la lista di indirizzi base delle working-zones dalla memoria, disposte
+secondo la specifica fornita, e produce in uscita l'indirizzo letto in input, eventualmente codificato come richiesto. Un successivo segnale di
+\emph{start} porta il dispositivo a riutilizzare le working-zones precedentemente caricate per codificare il nuovo indirizzo in input. Nel caso in cui
+dovesse giungere un segnale di \emph{reset} in qualsiasi stadio della computazione, lo stato del dispositivo verrebbe reinizializzato e, successivamente,
+le working-zones ricaricate qualora un segnale \emph{start} alto dovesse venir rilevato.\\
+Si assume che il segnale di \emph{reset} proveniente dall'esterno sia opprtunamente filtrato e privo di glitch.
 
 \section{Architettura}
+Architetturalmente, il componente è composto da due blocchi funzionali:
+\begin{itemize}
+    \item un controller sequenziale, che si occupa del trasferimento dei dati dalla RAM esterna alle memorie di lavoro interne e della scrittura del
+        risultato in RAM, nonché dell'invio dei segnali di controllo appropriati;
+    \item un encoder puramente combinatorio, che produce in uscita l'indirizzo, eventualmente codificato, basandosi sul contenuto delle memorie
+        interne.
+\end{itemize}
+Durante la progettazione si è cercato di ridurre al minimo la presenza di elementi \emph{stateful} per evitare di incorrere in problemi di
+sincronizzazione o reset incompleti. Inoltre, essendo l'encoder composto da circuiti combinatori, la velocità di conversione è sufficientemente alta da
+permettere al componente di concludere le operazioni nel giro di 3 cicli di clock, quando le working-zones sono già presenti nella memoria di lavoro.
+
+\subsection{Memoria di lavoro}
+Il componente è dotato di un banco di 9 registri PIPO a reset asincrono da 8 bit, contenente gli indirizzi base delle working-zones e l'indirizzo da
+codificare. Tutti i registri sono collegati ad un bus comune che ne controlla il segnale di \emph{write-enable} (\lstinline{we_bus}), sono direttamente
+connessi con la porta di reset globale (\lstinline{i_rst}) e funzionano a clock inverso.
+
+La scelta di porre il trigger sul fronte di discesa è dovuta al fatto che la RAM esterna produce i nuovi output sul fronte di salita. In questo modo, è
+possibile memorizzare i dati di lavoro non appena disponibili, senza ulteriore orchestrazione da parte dell'unità di controllo.
+
+\subsection{Encoder}
+L'encoder si collega direttamente alle memorie contenenti le basi delle working-zones e ne dirige l'output verso 8 comparatori paralleli. Tali comparatori
+verificano se l'indirizzo da codificare (memorizzato sul nono registro) cade all'interno della working-zone di propria competenza. Nel caso in cui ciò
+dovesse accadere, il comparatore della working-zone valida segnalerebbe sul bus \lstinline{active_zone} la propria attivazione.
+
+In seguito all'eventuale attivazione di una working-zone, un decoder ed un multiplexer si occupano di transcodificare il numero della working-zone attiva
+da one-hot a binario, e di prelevare il suo indirizzo base, rispettivamente. L'indirizzo base viene poi portato agli ingressi di un sottrattore, che
+calcola l'offset dell'indirizzo da codificare rispetto alla base.
+
+Infine, l'offset viene transcodificato in one-hot e concatenato all'altro sottocampo e al bit addizionale.
+
+Nel caso in cui nessuna working-zone dovesse risultare attiva, un semplice multiplexer devia l'indirizzo ricevuto in input direttamente verso l'output.
+
+\subsection{Controller}
+Il controller si configura come una macchina a stati finiti, implementata da 3 process, accoppiata ad un elemento sequenziale per l'attivazione dei
+segnali di \emph{WE} dei registri di lavoro.
+
+L'FSM è una variante di una macchina di Moore i cui stati sono identificati da una coppia stato proprio-indirizzo corrente, e dove la funzione lambda
+contribuisce alla determinazione dello stato successivo attraverso il calcolo del prossimo indirizzo. Gli stati propri sono:
+\begin{description}
+    \item[R:] stato di reset, dove la macchina giace in attesa del segnale di \emph{start}.
+    \item[LZ1:] primo stato di caricamento delle working-zones, in corrispondenza del quale si inizia la lettura della RAM a partire dal byte 0000 e si
+        incrementa l'indirizzo di 1 unità.
+    \item[LZ2:] secondo stato di caricamento delle working-zones. Se l'indirizzo corrente punta al limite della zona di memoria nella quale sono
+        memorizzate le WZ (0000-0007), si incrementa l'indirizzo di 1 unità e si transita nello stato LA, altrimenti si incrementa l'indirizzo e si
+        prosegue il caricamento transitando in LZ1.
+    \item[LA:] stato di caricamento dell'indirizzo da codificare.
+    \item[WA:] stato di scrittura del risultato in RAM. Si riporta l'indirizzo al byte 0009.
+    \item[D:] stato di completamento, dove il segnale \emph{done} viene alzato e si resta in attesa dell'abbassamento di \emph{start}.
+    \item[S:] stato di riposo (sleep), dove la macchina permane in attesa di un nuovo segnale di inizio computazione. Nel caso in cui tale segnale dovesse
+        sopraggiungere, la macchina transiterebbe nuovamente nello stato LA, essendo le basi delle working-zones già caricate.
+\end {description}
+Stato proprio e indirizzo corrente sono memorizzati da uno stesso process, funzionante in controfase con la memoria, il quale si occupa anche di di
+presentare il nuovo indirizzo all'uscita \lstinline{o_address}.
+
+L'altro componente del controller è un semplice process che, in corrispondenza del fronte di salita del clock, determina il registro di lavoro da abilitare
+in scrittura, basandosi sul valore corrente dell'indirizzo. In questo modo, il registro corretto può immediatamente acquisire il nuovo valore.
 
 \section{Risultati sperimentali}
 \subsection{Report di sintesi}

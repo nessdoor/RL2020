@@ -86,8 +86,61 @@ L'altro componente del controller è un semplice process che, in corrispondenza 
 in scrittura, basandosi sul valore corrente dell'indirizzo. In questo modo, il registro corretto può immediatamente acquisire il nuovo valore.
 
 \section{Risultati sperimentali}
+
 \subsection{Report di sintesi}
+
 \subsection{Simulazioni}
+Per condurre le simulazioni in un regime simile a quello dell'ipotetico normale funzionamento, è stato creato un apposito programma di simulazione
+comandabile da file. Tale apparato di testing ha reso semplice non solo eseguire più attivazioni successive con indirizzi e working-zones diverse, ma anche
+la generazione automatica di test casuali per mezzo di un apposito fuzzer.
+
+Per i dettagli riguardanti il tester e il fuzzer, si rimanda ad \ref{appendix:unitest} e ad \ref{appendix:fuzzer}.
+
+\subsubsection{Test case}
+Sono stati progettati alcuni test per stimolare quelle che si sono ritenute essere sezioni critiche del funzionamento o valori limite di alcune variabili,
+prima di procedere col fuzzing.
+
+\paragraph{\emph{Full-sweep}}
+Questo test punta a validare il funzionamento di base dell'encoder, fornendogli in input prima tutte le basi delle working-zones, poi prendendo una zona
+isolata e richiedendo la codifica di ogni suo membro. In questo modo è stato possibile testare gli elementi aritmetici del componente e la corretta
+rappresentazione delle informazioni nei campi del risultato codificato.
+
+\paragraph{Confini delle working-zones}
+Test per la verifica dell'appartenenza e della non appartenenza degli indirizzi posti ai margini delle working-zones. Si sono piazzate alcune WZ su range
+di indirizzi adiacenti e non, ed è stato richiesto al componente di produrre codifiche per gli indirizzi posti ai loro estremi e immemdiatamente al di
+fuori di essi. In questo modo sono stati validati i comparatori paralleli e i mux di selezione.
+
+\paragraph{Riproducibilità}
+Si è richiesta la codifica dello stesso indirizzo sia in due volte consecutive, sia dopo altri test. Un test banale per una proprietà universale
+fondamentale.
+
+\paragraph{Modifica delle working-zones e reset}
+Codifica, sostituzione e riorganizzazione delle working-zones, reset e successivo test di ricodifica. Alcuni indirizzi, che ricadevano al di fuori delle WZ
+nell'esecuzione precedente, sono utilizzati per verificare che l'inserimento di WZ che li contengono portino effettivamente alla nuova codifica, una volta
+avviata una nuova esecuzione (\emph{reset} + \emph{start}).
+
+\paragraph{Confini della memoria}
+Questo test controlla la correttezza nella rappresentazione degli indirizzi 0 e 127, sia che essi siano inclusi in working-zones terminali, sia che non lo
+siano. È un ulteriore test per la validazione dei comparatori e degli altri componenti algebrici.
+
+\paragraph{Partenza anticipata}
+Si è rimosso il ciclo di stasi dopo il segnale di reset per verificare che il funzionamento risulti corretto anche sotto vincoli di tempo più stringenti di
+quelli imposti nel test di riferimento.
+
+\paragraph{Reset durante il caricamento delle zone}
+Si inviano brevi segnali \emph{reset} al componente mentre questo sta procedendo al caricamento delle zone. Con un accurato timing degli impulsi, si cerca
+di produrre criticità negli elementi di controllo, specialmente in quello adibito all'attivazione dei registri di lavoro. Con impulsi sia prima che dopo
+il fronte di salita del clock, si verifica che tutte le zone vengano opportunamente ricaricate.
+
+\paragraph{Reset durante la codifica}
+%TODO
+
+\subsection{\emph{Fuzzing}}
+Il componente è stato sottoposto a varie iterazioni di fuzzing (molte migliaia), dove sia working-zones sia indirizzi son stati generati casualmente,
+seppur rispettando le condizioni di non sovrapposizione delle WZ, il range di indirizzi 0-127 e alcune regole di ottimizzazione aggiuntive.
+
+In particolare, ad ogni iterazione si visitano in ordine casuale indirizzi appartenenti ad un insieme che racchiude strettamente quelli coperti dalle
+zone di lavoro, evitando inutili percorsi nello spazio d'indirizzamento che non attivano nessuna codifica speciale.
 
 \section{Conclusioni}
 
@@ -95,4 +148,7 @@ in scrittura, basandosi sul valore corrente dell'indirizzo. In questo modo, il r
 
 \appendix
 \section{Tester unificato}
+\label{appendix:unitest}
+\section{Fuzzer}
+\label{appendix:fuzzer}
 \end{document}

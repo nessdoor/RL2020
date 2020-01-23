@@ -95,9 +95,13 @@ V F8
  75 ns 1 0 0 0000 00
  0 ns 0 1 0 0000 00
 V 81
- 1 ns 0 0 0 0000 00 # Test reproducibility immediately after previous run
+ 1 ns 0 0 0 0000 00 # Test reproducibility immediately after previous run...
  1 ns 0 1 0 0000 00
 V 81
+ 100 ns 0 0 1 0008 25 # ...and after things have changed quite a lot
+ 100 ns 0 1 0 0000 00
+V C1
+ 100 ns 0 0 1 0008 0D
  100 ns 1 0 0 0000 00 # Test reset: before new WE signals get generated
  425 ns 0 1 0 0000 00
  5 ns 1 1 0 0000 00

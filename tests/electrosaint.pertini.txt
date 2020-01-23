@@ -98,14 +98,55 @@ V 81
  1 ns 0 0 0 0000 00 # Test reproducibility immediately after previous run
  1 ns 0 1 0 0000 00
 V 81
-# TODO Check ALL of the zones
  100 ns 1 0 0 0000 00 # Test reset: before new WE signals get generated
  425 ns 0 1 0 0000 00
  5 ns 1 1 0 0000 00
  0 ns 0 1 0 0000 00
 V 81
+ 100 ns 0 0 1 0008 04
+ 100 ns 0 1 0 0000 00
+V 91
+ 100 ns 0 0 1 0008 16
+ 100 ns 0 1 0 0000 00
+V A1
+ 100 ns 0 0 1 0008 1F
+ 100 ns 0 1 0 0000 00
+V B1
+ 100 ns 0 0 1 0008 25
+ 100 ns 0 1 0 0000 00
+V C1
+ 100 ns 0 0 1 0008 2D
+ 100 ns 0 1 0 0000 00
+V D1
+ 100 ns 0 0 1 0008 4D
+ 100 ns 0 1 0 0000 00
+V E1
+ 100 ns 0 0 1 0008 7C
+ 100 ns 0 1 0 0000 00
+V F1
  100 ns 1 0 0 0000 00 # Test reset: after new WE signals get generated
  475 ns 0 1 0 0000 00
  5 ns 1 1 0 0000 00
  0 ns 0 1 0 0000 00
+V F1
+ 100 ns 0 0 1 0008 4D
+ 100 ns 0 1 0 0000 00
+V E1
+ 100 ns 0 0 1 0008 2D
+ 100 ns 0 1 0 0000 00
+V D1
+ 100 ns 0 0 1 0008 25
+ 100 ns 0 1 0 0000 00
+V C1
+ 100 ns 0 0 1 0008 1F
+ 100 ns 0 1 0 0000 00
+V B1
+ 100 ns 0 0 1 0008 16
+ 100 ns 0 1 0 0000 00
+V A1
+ 100 ns 0 0 1 0008 04
+ 100 ns 0 1 0 0000 00
+V 91
+ 100 ns 0 0 1 0008 0D
+ 100 ns 0 1 0 0000 00
 V 81

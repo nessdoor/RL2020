@@ -1,5 +1,5 @@
 from sys import argv
-from random import seed, randrange
+from random import seed, randrange, shuffle
 from typing import Collection, Sequence, List
 
 
@@ -81,7 +81,7 @@ if __name__ == '__main__':
 
         wzs = generate_test_zones(8)
         inputs = generate_test_inputs(wzs)
-        # TODO Shuffle these damned inputs, so that we're not sequentially-biased
+        shuffle(inputs)
 
         for z in wzs:
             print(generate_wz(wzs.index(z), z))

@@ -102,7 +102,8 @@ V 81
  100 ns 0 1 0 0000 00
 V C1
  100 ns 0 0 1 0008 0D
- 100 ns 1 0 0 0000 00 # Test reset: before new WE signals get generated
+ 100 ns 0 0 1 0005 5D # Test reset: before new WE signals get generated
+ 100 ns 1 0 0 0000 00
  425 ns 0 1 0 0000 00
  5 ns 1 1 0 0000 00
  0 ns 0 1 0 0000 00
@@ -121,14 +122,15 @@ V B1
 V C1
  100 ns 0 0 1 0008 2D
  100 ns 0 1 0 0000 00
-V D1
+V 2D
  100 ns 0 0 1 0008 4D
  100 ns 0 1 0 0000 00
 V E1
  100 ns 0 0 1 0008 7C
  100 ns 0 1 0 0000 00
 V F1
- 100 ns 1 0 0 0000 00 # Test reset: after new WE signals get generated
+ 100 ns 0 0 1 0005 2D # Test reset: after new WE signals get generated
+ 100 ns 1 0 0 0000 00
  475 ns 0 1 0 0000 00
  5 ns 1 1 0 0000 00
  0 ns 0 1 0 0000 00
@@ -154,8 +156,9 @@ V 91
  100 ns 0 0 1 0008 0D
  100 ns 0 1 0 0000 00
 V 81
- 100 ns 0 0 1 0008 2F # Test reset: while encoding
+ 100 ns 0 0 1 0005 5D # Test reset: while encoding
+ 100 ns 0 0 1 0008 2F
  250 ns 0 1 0 0000 00
  1 ns 1 1 0 0000 00
  0 ns 0 1 0 0000 00
-V D4
+V 2F

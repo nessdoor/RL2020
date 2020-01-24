@@ -127,13 +127,15 @@ siano. È un ulteriore test per la validazione dei comparatori e degli altri com
 Si è rimosso il ciclo di stasi dopo il segnale di reset per verificare che il funzionamento risulti corretto anche sotto vincoli di tempo più stringenti di
 quelli imposti nel test di riferimento.
 
+\paragraph{Reset durante la codifica}
+Test che tenta di produrre una criticità nella macchina di controllo inviando un segnale di reset durante la fase di ouput dell'indirizzo codificato (stato
+\emph{WA}) e verificando che ciò provochi un regolare reset. Tale verifica è effettuata spostando una zona senza resettare la macchina e chiedendo la
+codifica di un indirizzo precedentemente coperto da essa. Se la codifica cambia nella maniera attesa, il reset è avvenuto con successo.
+
 \paragraph{Reset durante il caricamento delle zone}
 Si inviano brevi segnali \emph{reset} al componente mentre questo sta procedendo al caricamento delle zone. Con un accurato timing degli impulsi, si cerca
 di produrre criticità negli elementi di controllo, specialmente in quello adibito all'attivazione dei registri di lavoro. Con impulsi sia prima che dopo
-il fronte di salita del clock, si verifica che tutte le zone vengano opportunamente ricaricate.
-
-\paragraph{Reset durante la codifica}
-%TODO
+il fronte di salita del clock, si verifica che tutte le zone vengano opportunamente ricaricate, sfruttando la stessa strategia del test precedente.
 
 \subsection{\emph{Fuzzing}}
 Il componente è stato sottoposto a varie iterazioni di fuzzing (molte migliaia), dove sia working-zones sia indirizzi son stati generati casualmente,

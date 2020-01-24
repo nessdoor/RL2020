@@ -25,7 +25,7 @@ def generate_test_inputs(zones: Collection[int]) -> List[int]:
     input_set.add(1)
     
     for wz in zones:
-        for address in range(wz - 2, wz + 3):
+        for address in range(wz - 2, wz + 7):
             if 0 <= address <= 127:
                 input_set.add(address)
 

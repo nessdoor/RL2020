@@ -1,4 +1,14 @@
 *.swp
+*.aux
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.pdf
+*.synctex.gz
+*.toc
+*.xdv
+
 RL1920.cache/
 RL1920.hw/
 RL1920.ip_user_files/

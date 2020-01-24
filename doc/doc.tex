@@ -4,7 +4,6 @@
 \setdefaultlanguage{italian}
 \usepackage{listings}
 \usepackage{graphicx}
-\usepackage{amsmath}
 \lstset{language=VHDL,
     columns=flexible,
     basicstyle={\small\ttfamily}}
@@ -137,7 +136,7 @@ Si inviano brevi segnali \emph{reset} al componente mentre questo sta procedendo
 di produrre criticità negli elementi di controllo, specialmente in quello adibito all'attivazione dei registri di lavoro. Con impulsi sia prima che dopo
 il fronte di salita del clock, si verifica che tutte le zone vengano opportunamente ricaricate, sfruttando la stessa strategia del test precedente.
 
-\subsection{\emph{Fuzzing}}
+\subsubsection{\emph{Fuzzing}}
 Il componente è stato sottoposto a varie iterazioni di fuzzing (molte migliaia), dove sia working-zones sia indirizzi son stati generati casualmente,
 seppur rispettando le condizioni di non sovrapposizione delle WZ, il range di indirizzi 0-127 e alcune regole di ottimizzazione aggiuntive.
 
@@ -145,12 +144,54 @@ In particolare, ad ogni iterazione si visitano in ordine casuale indirizzi appar
 zone di lavoro, evitando inutili percorsi nello spazio d'indirizzamento che non attivano nessuna codifica speciale.
 
 \section{Conclusioni}
+Il componente risulta funzionante entro le specifiche dettate. Grazie alla memorizzazione interna delle working-zones e alla comparazione parallela, è
+possibile la sua integrazione in un sistema che richieda di convertire, a ritmi non troppo elevati, un flusso di indirizzi fisici in un flusso codificato.
+
+Durante il testing si è prestata particolare attenzione nel validare il componente ponendo limiti più stretti di quelli comunicati esplicitamente nel
+documento di specifica, o implicitamente attraverso il test bench di riferimento; in particolare, si è tentato di eliminare i cicli di attesa tra le
+conversioni e si sono controllati più frequentemente i segnali emessi dal componente.
+
+Spingendosi brevemente nel dominio delle simulazioni timing, si è anche preventivamente corretto un problema di glitch sul segnale \emph{done} filtrandolo
+con un flip-flop.
 
 \newpage
 
 \appendix
 \section{Tester unificato}
 \label{appendix:unitest}
+Per verificare il corretto funzionamento del componente, è stato realizzato un programma VHDL in grado di presentare all'UUT una RAM analoga a quella
+fornita col test di esempio, ma i cui valori possono essere aggiornati da parte di un process pilotato da un file di stimoli esterno.
+
+Per ogni linea del file sono specificati i segnali da inviare al componente (\lstinline{tb_reset} e \lstinline{tb_start}), i valori da scrivere in RAM
+(indirizzo e contenuto) e il tempo da attendere dopo ogni aggiornamento.\\
+Inoltre, alcune linee speciali segnalano al tester di eseguire una verifica del risultato; in questo caso, il programma si pone in attesa del segnale di
+\emph{done} e, non appena questo viene alzato, verifica che il valore presente all'indirizzo 0009 sia uguale a quello specificato sulla linea di
+checkpoint. Inoltre, il risultato viene ricontrollato anche in corrispondenza dell'abbassamento di \lstinline{tb_done} per scongiurare il rischio di
+riscritture accidentali dovute a malfunzionamenti dell'unità di controllo.
+
+Poiché il programma si ferma solo in corrispondenza della fine del file, è possibile lanciare più esecuzioni, anche con working-zones diverse, all'interno
+di una stessa simulazione.
+
+Per rendere più agevole la correzione dei difetti, il tester è in grado di stampare eventuali messaggi presenti in coda alle linee dei segnali.
+
 \section{Fuzzer}
 \label{appendix:fuzzer}
+Per rendere meno probabile la presenza di difetti non rilevati attraverso i test manuali, è stato realizzato un fuzzer in grado di generare casualmente
+delle working-zones e un set appropriato di indirizzi col quale testare la funzionalità del componente.
+
+Il fuzzer è stato implementato nella forma di un semplice script Python che, dato in input un intero, restituisce in ouput un egual numero di
+``test runs``, dove una test run è una serie di linee di testo, nel formato utilizzato dal tester, che descrivono un caricamento di working-zones seguito
+da molteplici richieste di codifica, ognuna seguita dal corrispondente checkpoint.
+
+La generazione dei test avviene rispettando le seguenti regole:
+\begin{enumerate}
+    \item Le working-zones non devono sovrapporsi, e lo spazio indirizzato da ciascuna deve trovarsi all'interno dell'intervallo 0-127.
+    \item Gli indirizzi 0, 1, 126 e 127 devono essere sempre visitati.
+    \item Per ogni zona, detta $B$ la sua base, devono essere visitati gli indirizzi dell'intervallo $[B - 2, B + 6]$.
+    \item Ciascun indirizzo dev'essere visitato solo una volta.
+    \item Gli indirizzi da verificare devono essere visitati in ordine casuale.
+\end{enumerate}
+
+In questo modo, è stato possibile sottoporre il componente ad un gran numero di test in maniera semiautomatica.
+
 \end{document}

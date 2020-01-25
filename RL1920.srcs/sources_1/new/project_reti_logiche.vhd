@@ -113,6 +113,7 @@ begin
                 );
 
         reg_bus((a * 8 + 7) downto (a * 8)) <= local_base;
+        -- Why a multiplexer? Because a boolean condition is not an STD_LOGIC value...
         active_zone(a) <= '1' when (UNSIGNED(input_address) >= UNSIGNED(local_base))
                             and (UNSIGNED(input_address) < (UNSIGNED(local_base) + to_unsigned(4,8))) else
                           '0';

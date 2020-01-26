@@ -5,6 +5,7 @@
 \setdefaultlanguage{italian}
 \usepackage{listings}
 \usepackage{graphicx}
+\usepackage{caption}
 \lstset{language=VHDL,
     columns=flexible,
     basicstyle={\small\ttfamily},
@@ -114,6 +115,24 @@ in scrittura, basandosi sul valore corrente dell'indirizzo. In questo modo, il r
 \section{Risultati sperimentali}
 
 \subsection{Report di sintesi}
+Si riportano frammenti del report di sintesi per il componente.
+
+\lstdefinestyle{synthresport}{language={},numbers=none,basicstyle={\tiny\ttfamily},breaklines}
+
+\begin{minipage}{\linewidth}
+    \lstinputlisting[style=synthresport,firstline=42,lastline=58]{../RL1920.runs/synth_1/project_reti_logiche.vds}
+    \captionof*{table}{Sintesi degli elementi sequenziali.}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+    \lstinputlisting[style=synthresport,firstline=69,lastline=121]{../RL1920.runs/synth_1/project_reti_logiche.vds}
+    \captionof*{table}{Statistiche dei componenti RTL.}
+\end{minipage}
+
+\begin{minipage}{\linewidth}
+    \lstinputlisting[style=synthresport,firstline=241,lastline=272]{../RL1920.runs/synth_1/project_reti_logiche.vds}
+    \captionof*{table}{Statistiche di utilizzo.}
+\end{minipage}
 
 \subsection{Simulazioni}
 Per condurre le simulazioni in un regime simile a quello dell'ipotetico normale funzionamento, è stato creato un apposito programma di simulazione

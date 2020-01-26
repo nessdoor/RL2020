@@ -46,7 +46,8 @@ def encode_address(zones: Sequence[int], address: int) -> int:
 
 
 def generate_wz(index: int, base: int) -> str:
-    return " 100 ns 0 0 1 " + '{:04X}'.format(index) + " " + '{:02X}'.format(base)
+    return " 100 ns 0 0 1 " + '{:04X}'.format(index) +\
+            " " + '{:02X}'.format(base)
 
 
 def generate_input(address: int) -> str:

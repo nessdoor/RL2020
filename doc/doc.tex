@@ -7,7 +7,8 @@
 \usepackage{graphicx}
 \lstset{language=VHDL,
     columns=flexible,
-    basicstyle={\small\ttfamily}}
+    basicstyle={\small\ttfamily},
+    numbers=left}
 \title{\textbf{Progetto di Reti Logiche 2020}}
 \author{Tomas Antonio Lopez}
 \begin{document}
@@ -200,6 +201,11 @@ di una stessa simulazione.
 
 Per rendere più agevole la correzione dei difetti, il tester è in grado di stampare eventuali messaggi presenti in coda alle linee dei segnali.
 
+\pagebreak
+\subsubsection{Implementazione del tester}
+\lstinputlisting[firstline=22,breaklines]{../RL1920.srcs/sim_1/new/unitest.vhd}
+\pagebreak
+
 \section{Fuzzer}
 \label{appendix:fuzzer}
 Per rendere meno probabile la presenza di difetti non rilevati attraverso i test manuali, è stato realizzato un fuzzer in grado di generare casualmente
@@ -219,5 +225,9 @@ La generazione dei test avviene rispettando le seguenti regole:
 \end{enumerate}
 
 In questo modo, è stato possibile sottoporre il componente ad un gran numero di test in maniera semiautomatica.
+
+\pagebreak
+\subsubsection{Implementazione del fuzzer}
+\lstinputlisting[language=python,breaklines]{../tests/main.py}
 
 \end{document}

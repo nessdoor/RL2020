@@ -12,6 +12,7 @@
 -- 
 -- Dependencies: None
 -- 
+-- Revision: 1.2 - Synchronized o_done on rising edge
 -- Revision: 1.1 - Moved wz_loaded logic inside delta process
 -- Revision: 1.0 - Tested and functional
 -- Revision 0.01 - File Created
@@ -19,6 +20,7 @@
 -- 
 ----------------------------------------------------------------------------------
 
+--- 8 BIT REGISTER COMMON COMPONENT ---
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
@@ -43,6 +45,7 @@ begin
 end rtl;
 
 
+--- MAIN COMPONENT ---
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -60,25 +63,36 @@ entity project_reti_logiche is
 end project_reti_logiche;
 
 architecture Behavioral of project_reti_logiche is
+    -- Proper machine states
     type state is (R, LZ1, LZ2, LA, WA, D, S);
 
     signal currs, nexs: state;
     signal inv_clk: STD_LOGIC;
+    -- The address that has to be encoded
     signal input_address: STD_LOGIC_VECTOR (7 downto 0);
+    -- Improper machine state signals (twin state)
     signal new_mem_addr: UNSIGNED (15 downto 0);
     signal curr_mem_addr: UNSIGNED (15 downto 0);
 
+    -- Control&data buses for working registers
     signal we_bus: STD_LOGIC_VECTOR (8 downto 0);
     signal reg_bus: STD_LOGIC_VECTOR (63 downto 0);
-    signal base: STD_LOGIC_VECTOR (7 downto 0);
 
+    -- Bus for zone activation signals
     signal active_zone: STD_LOGIC_VECTOR (7 downto 0);
+    -- The active zone's base address
+    signal base: STD_LOGIC_VECTOR (7 downto 0);
+    -- Calculated offset of input address inside zone
     signal offset: UNSIGNED (7 downto 0);
+    -- The active zone's number
     signal zone_number: STD_LOGIC_VECTOR (2 downto 0);
+    -- Final result
     signal encoded_addr: STD_LOGIC_VECTOR (7 downto 0);
 
-    signal sync_o_done: STD_LOGIC;
+    -- Internal 'done' signal, output by the FSM
+    signal async_o_done: STD_LOGIC;
 
+    -- Function for one-hot offset encoding
     function offset_to_oh (i: UNSIGNED (7 downto 0))
     return STD_LOGIC_VECTOR is
         variable offoh: STD_LOGIC_VECTOR (3 downto 0) := (others => '0');
@@ -99,7 +113,7 @@ begin
                 o_addr => input_address
             );
 
-    -- Generate registers and membership logic for each zone
+    -- Generate registers and membership logic (comparators) for each zone
     zones: for a in 7 downto 0 generate
         signal local_base: STD_LOGIC_VECTOR (7 downto 0);
     begin
@@ -150,11 +164,12 @@ begin
     encoded_addr <= '1' & zone_number & offset_to_oh(offset);
 
     -- Check if WZ encoding has taken place.
-    -- If that's the case, output the encoded address, otherwise copy the input to the output
+    -- If that's the case, output the encoded address, otherwise forward the input to the output
     with active_zone select
         o_data <= input_address when "00000000",
                   encoded_addr when others;
 
+    -- State register and memory address setter
     state_output: process (i_clk, i_rst)
     begin
         if i_rst = '1' then
@@ -174,13 +189,14 @@ begin
         if i_rst = '1' then
             o_done <= '0';
         elsif i_clk'event and i_clk = '1' then
-            o_done <= sync_o_done;
+            o_done <= async_o_done;
         end if;
     end process sync_done;
 
+    -- Register Enabler
     -- Generates WE signals for the internal registers based on the current memory address
     we_sigs_phaser: process (i_clk, i_rst)
-        -- Support variable to compute new write-enable signals for internatl registers
+        -- Support variable to compute new write-enable signals for internal registers
         variable new_we_sigs:STD_LOGIC_VECTOR (9 downto 0);
     begin
         new_we_sigs := (others => '0');
@@ -196,6 +212,7 @@ begin
         end if;
     end process we_sigs_phaser;
 
+    -- Control FSM: delta function
     delta: process (currs, i_start, curr_mem_addr)
     begin
         case currs is
@@ -233,42 +250,43 @@ begin
         end case;
     end process delta;
 
+    -- Control FSM: lambda function
     lambda: process (currs, curr_mem_addr)
     begin
         case currs is
             when R =>
                 new_mem_addr <= (others => '0');
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '0';
                 o_we <= '-';
             when LZ1 =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when LZ2 =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when LA =>
                 new_mem_addr <= curr_mem_addr + to_unsigned(1, 16);
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '1';
                 o_we <= '0';
             when WA =>
                 new_mem_addr <= to_unsigned(8, 16);
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '1';
                 o_we <= '1';
             when D =>
                 new_mem_addr <= curr_mem_addr;
-                sync_o_done <= '1';
+                async_o_done <= '1';
                 o_en <= '0';
                 o_we <= '-';
             when S =>
                 new_mem_addr <= curr_mem_addr;
-                sync_o_done <= '0';
+                async_o_done <= '0';
                 o_en <= '0';
                 o_we <= '-';
         end case;

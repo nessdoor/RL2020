@@ -84,6 +84,7 @@ begin
         tb_clk <= not tb_clk;
     end process p_CLK_GEN;
 
+    -- Controller override muxes
     with input_select_internal select
         mem_i_data <= input_data when '0',
                       set_data when '1',
@@ -94,6 +95,7 @@ begin
                        set_address when '1',
                        (others => 'X') when others;
 
+    -- Intertwined enable wires: override implies controller-writes-memory
     enable_wire <= ext_en or input_select_internal;
     mem_we <= ext_we or input_select_internal;
 
@@ -110,6 +112,7 @@ begin
         end if;
     end process;
 
+    -- Controlling process
     SEQUENCER: process
         file text_file: text open read_mode is "/home/tlopez/Devel/Hardware/RL1920/tests/electrosaint.pertini.txt";
         variable text_line: line;
@@ -136,7 +139,7 @@ begin
             read(text_line, char, ok);
             if char = 'V' then
                 read(text_line, char, ok); -- Read blank
-                hread(text_line, expected_output, ok);
+                hread(text_line, expected_output, ok); -- Read expected output
                 assert ok report "Read 'expected_output' failed for line: " &
                  text_line.all severity failure;
 
@@ -153,6 +156,7 @@ begin
                 tb_start <= '0';
                 wait until tb_done = '0';
 
+                -- Repeat measurement after activity is over
                 assert RAM(9) = expected_output report "TEST FAILED. Expected " &
                  integer'image(to_integer(unsigned(expected_output))) &
                  ", found " &
@@ -166,25 +170,31 @@ begin
             end if;
             --
 
+            -- Read waiting time
             read(text_line, wait_time, ok);
             assert ok report "Read 'wait_time' failed for line: " & text_line.all severity failure;
 
+            -- Read reset signal
             read(text_line, reset, ok);
             assert ok report "Read 'rst' failed for line: " & text_line.all severity failure;
             tb_rst <= reset;
 
+            -- Read start signal
             read(text_line, start, ok);
             assert ok report "Read 'start' failed for line: " & text_line.all severity failure;
             tb_start <= start;
 
+            -- Read override signal
             read(text_line, activate_internal, ok);
             assert ok report "Read 'activate_internal' failed for line: " & text_line.all severity failure;
             input_select_internal <= activate_internal;
 
+            -- Read address
             hread(text_line, address, ok);
             assert ok report "Read 'address' failed for line: " & text_line.all severity failure;
             set_address <= address;
 
+            -- Read data
             hread(text_line, data, ok);
             assert ok report "Read 'data' failed for line: " & text_line.all severity failure;
             set_data <= data;
@@ -197,7 +207,7 @@ begin
 
             if char = '#' then
                 read(text_line, char, ok); -- Skip space
-                report text_line.all;
+                report text_line.all; -- Print message
             end if;
             --
         end loop;

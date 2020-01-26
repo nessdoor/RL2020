@@ -4,11 +4,14 @@ from typing import Collection, Sequence, List
 
 
 def generate_test_zones(quantity: int) -> List[int]:
+    """Generates non-overlapping test zones"""
+
     zones = list()
     covered_addresses = set()
     while len(zones) < quantity:
         candidate = randrange(0, 125)
 
+        # Zone collision check
         if {candidate, candidate + 3}.isdisjoint(covered_addresses):
             zones.append(candidate)
             
@@ -19,8 +22,11 @@ def generate_test_zones(quantity: int) -> List[int]:
 
 
 def generate_test_inputs(zones: Collection[int]) -> List[int]:
+    """Generates inputs for complete zones coverage"""
+
     input_set = set()
 
+    # Always check lower boundary
     input_set.add(0)
     input_set.add(1)
     
@@ -29,6 +35,7 @@ def generate_test_inputs(zones: Collection[int]) -> List[int]:
             if 0 <= address <= 127:
                 input_set.add(address)
 
+    # Always check upper boundary
     input_set.add(126)
     input_set.add(127)
 
@@ -36,6 +43,8 @@ def generate_test_inputs(zones: Collection[int]) -> List[int]:
 
 
 def encode_address(zones: Sequence[int], address: int) -> int:
+    """Encodes a numeric address into a working-zone encoded one"""
+
     output = address
     
     for wz in zones:
@@ -72,6 +81,7 @@ def generate_pause() -> str:
 
 if __name__ == '__main__':
     seed()
+    # By default, generate at least one test-run
     iterations = 1
 
     if len(argv) > 1:
@@ -82,6 +92,7 @@ if __name__ == '__main__':
 
         wzs = generate_test_zones(8)
         inputs = generate_test_inputs(wzs)
+        # Randomize address walk
         shuffle(inputs)
 
         for z in wzs:

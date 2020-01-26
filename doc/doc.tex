@@ -25,8 +25,8 @@ Il componente richiesto consiste in un \emph{working-zone encoder} per indirizzi
 Al primo segnale di \emph{start} dopo un \emph{reset}, il componente carica la lista di indirizzi base delle working-zones dalla memoria, disposte
 secondo la specifica fornita, e produce in uscita l'indirizzo letto in input, eventualmente codificato come richiesto. Un successivo segnale di
 \emph{start} porta il dispositivo a riutilizzare le working-zones precedentemente caricate per codificare il nuovo indirizzo in input. Nel caso in cui
-dovesse giungere un segnale di \emph{reset} in qualsiasi stadio della computazione, lo stato del dispositivo verrebbe reinizializzato e, successivamente,
-le working-zones ricaricate qualora un segnale \emph{start} alto dovesse venir rilevato.\\
+dovesse giungere un segnale di \emph{reset} durante qualunque stadio della computazione, lo stato del dispositivo verrebbe reinizializzato e,
+successivamente, le working-zones ricaricate qualora un segnale \emph{start} alto dovesse venir rilevato.\\
 Si assume che il segnale di \emph{reset} proveniente dall'esterno sia opprtunamente filtrato e privo di glitch.
 
 \section{Architettura}
@@ -56,8 +56,8 @@ Il componente è dotato di un banco di 9 registri PIPO a reset asincrono da 8 bi
 codificare. Tutti i registri sono collegati ad un bus comune che ne controlla il segnale di \emph{write-enable} (\lstinline{we_bus}), sono direttamente
 connessi con la porta di reset globale (\lstinline{i_rst}) e funzionano a clock inverso.
 
-La scelta di porre il trigger sul fronte di discesa è dovuta al fatto che la RAM esterna produce i nuovi output sul fronte di salita. In questo modo, è
-possibile memorizzare i dati di lavoro non appena disponibili, senza ulteriore orchestrazione da parte dell'unità di controllo.
+Il trigger è stato posto sul fronte di discesa perché la RAM esterna produce i nuovi output sul fronte di salita. In questo modo, è possibile memorizzare i
+dati di lavoro non appena disponibili, senza ulteriore orchestrazione da parte dell'unità di controllo.
 
 \subsection{Encoder}
 \begin{figure}[htp]
@@ -70,12 +70,14 @@ possibile memorizzare i dati di lavoro non appena disponibili, senza ulteriore o
     \caption[Comparatore]{Schema di una unità comparatrice.\label{comparator}}
 \end{figure}
 
-L'encoder si collega direttamente alle memorie contenenti le basi delle working-zones e ne dirige l'output verso 8 comparatori paralleli [\ref{comparator}].
-Tali comparatori verificano se l'indirizzo da codificare (memorizzato sul nono registro) cade all'interno della working-zone di propria competenza. Nel caso
-in cui ciò dovesse accadere, il comparatore della working-zone valida segnalerebbe sul bus \lstinline{active_zone} la propria attivazione.
+L'encoder si collega direttamente alle memorie contenenti le basi delle working-zones\footnote{In realtà, i comparatori sono strettamente integrati con i
+registri di lavoro. Dal punto di vista del linguaggio di descrizione, infatti, fanno parte dello stesso modulo.} e ne dirige l'output verso 8 comparatori
+paralleli [\ref{comparator}].
+Tali comparatori verificano se l'indirizzo da codificare (memorizzato sul nono registro) cade all'interno della working-zone di propria competenza. Nel
+caso in cui ciò dovesse accadere, il comparatore della working-zone valida segnalerebbe sul bus \lstinline{active_zone} la propria attivazione.
 
 In seguito all'eventuale attivazione di una working-zone, un encoder ed un selettore si occupano di transcodificare il numero della working-zone attiva
-da one-hot a binario, e di prelevare il suo indirizzo base, rispettivamente. L'indirizzo base viene poi portato agli ingressi di un sottrattore, che
+da one-hot a binario e di prelevare il suo indirizzo base, rispettivamente. L'indirizzo base viene poi portato agli ingressi di un sottrattore, che
 calcola l'offset dell'indirizzo da codificare rispetto alla base.
 
 Infine, l'offset viene decodificato in one-hot e concatenato all'altro sottocampo e al bit addizionale.
@@ -96,10 +98,10 @@ contribuisce alla determinazione dello stato successivo attraverso il calcolo de
         memorizzate le WZ (0000-0007), si incrementa l'indirizzo di 1 unità e si transita nello stato LA, altrimenti si incrementa l'indirizzo e si
         prosegue il caricamento transitando in LZ1.
     \item[LA:] stato di caricamento dell'indirizzo da codificare.
-    \item[WA:] stato di scrittura del risultato in RAM. Si riporta l'indirizzo al byte 0009.
+    \item[WA:] stato di scrittura del risultato in RAM. Si riporta l'indirizzo al byte 0008.
     \item[D:] stato di completamento, dove il segnale \emph{done} viene alzato e si resta in attesa dell'abbassamento di \emph{start}.
     \item[S:] stato di riposo (sleep), dove la macchina permane in attesa di un nuovo segnale di inizio computazione. Nel caso in cui tale segnale dovesse
-        sopraggiungere, la macchina transiterebbe nuovamente nello stato LA, essendo le basi delle working-zones già caricate.
+        sopraggiungere, la macchina transiterebbe nuovamente nello stato LA, evitando di ricaricare le working-zones.
 \end {description}
 Stato proprio e indirizzo corrente sono memorizzati da uno stesso process, funzionante in controfase con la memoria, il quale si occupa anche di di
 presentare il nuovo indirizzo all'uscita \lstinline{o_address}.
@@ -143,17 +145,21 @@ Per i dettagli riguardanti il tester e il fuzzer, si rimanda alle appendici \ref
 
 \subsubsection{Test case}
 Sono stati progettati alcuni test per stimolare quelle che si sono ritenute essere sezioni critiche del funzionamento o valori limite di alcune variabili,
-prima di procedere col fuzzing.
+prima di procedere con il fuzzing.
 
 \paragraph{\emph{Full-sweep}}
 Questo test punta a validare il funzionamento di base dell'encoder, fornendogli in input prima tutte le basi delle working-zones, poi prendendo una zona
-isolata e richiedendo la codifica di ogni suo membro. In questo modo è stato possibile testare gli elementi aritmetici del componente e la corretta
-rappresentazione delle informazioni nei campi del risultato codificato.
+isolata e richiedendo la codifica di ogni suo membro.
+
+In questo modo è stato possibile testare gli elementi aritmetici del componente e la corretta rappresentazione delle informazioni nei campi del risultato
+codificato.
 
 \paragraph{Confini delle working-zones}
 Test per la verifica dell'appartenenza e della non appartenenza degli indirizzi posti ai margini delle working-zones. Si sono piazzate alcune WZ su range
-di indirizzi adiacenti e non, ed è stato richiesto al componente di produrre codifiche per gli indirizzi posti ai loro estremi e immemdiatamente al di
-fuori di essi. In questo modo sono stati validati i comparatori paralleli e i mux di selezione.
+di indirizzi adiacenti e non, ed è stato richiesto al componente di produrre codifiche per gli indirizzi posti ai loro estremi e immediatamente al di
+fuori di essi.
+
+In questo modo sono stati validati i comparatori paralleli e i mux di selezione.
 
 \paragraph{Riproducibilità}
 Si è richiesta la codifica dello stesso indirizzo sia in due volte consecutive, sia dopo altri test. Un test banale per una proprietà universale
@@ -174,8 +180,10 @@ quelli imposti nel test di riferimento.
 
 \paragraph{Reset durante la codifica}
 Test che tenta di produrre una criticità nella macchina di controllo inviando un segnale di reset durante la fase di ouput dell'indirizzo codificato (stato
-\emph{WA}) e verificando che ciò provochi un regolare reset. Tale verifica è effettuata spostando una zona senza resettare la macchina e chiedendo la
-codifica di un indirizzo precedentemente coperto da essa. Se la codifica cambia nella maniera attesa, il reset è avvenuto con successo.
+\emph{WA}), verificando che ciò provochi un regolare reset.
+
+Tale verifica è effettuata spostando una zona senza resettare la macchina e chiedendo la codifica di un indirizzo precedentemente coperto da essa. Se la
+codifica cambia nella maniera attesa, il reset è avvenuto con successo.
 
 \paragraph{Reset durante il caricamento delle zone}
 Si inviano brevi segnali \emph{reset} al componente mentre questo sta procedendo al caricamento delle zone. Con un accurato timing degli impulsi, si cerca
@@ -183,8 +191,9 @@ di produrre criticità negli elementi di controllo, specialmente in quello adibi
 il fronte di salita del clock, si verifica che tutte le zone vengano opportunamente ricaricate, sfruttando la stessa strategia del test precedente.
 
 \subsubsection{\emph{Fuzzing}}
-Il componente è stato sottoposto a varie iterazioni di fuzzing (molte migliaia), dove sia working-zones sia indirizzi son stati generati casualmente,
-seppur rispettando le condizioni di non sovrapposizione delle WZ, il range di indirizzi 0-127 e alcune regole di ottimizzazione aggiuntive.
+Il componente è stato sottoposto a varie iterazioni di fuzzing (molte migliaia), dove sia working-zones che indirizzi son stati generati casualmente.
+La generazione è avvenuta  rispettando le condizioni di non sovrapposizione delle WZ, il range di indirizzi 0-127 e alcune regole di ottimizzazione
+aggiuntive.
 
 In particolare, ad ogni iterazione si visitano in ordine casuale indirizzi appartenenti ad un insieme che racchiude strettamente quelli coperti dalle
 zone di lavoro, evitando inutili percorsi nello spazio d'indirizzamento che non attivano nessuna codifica speciale.
@@ -197,7 +206,7 @@ Durante il testing si è prestata particolare attenzione nel validare il compone
 documento di specifica, o implicitamente attraverso il test bench di riferimento; in particolare, si è tentato di eliminare i cicli di attesa tra le
 conversioni e si sono controllati più frequentemente i segnali emessi dal componente.
 
-Spingendosi brevemente nel dominio delle simulazioni timing, si è anche preventivamente corretto un problema di glitch sul segnale \emph{done} filtrandolo
+Spingendosi brevemente nel dominio delle simulazioni timing, si è anche preventivamente corretto un problema di glitch sul segnale \emph{done}, filtrandolo
 con un flip-flop.
 
 \newpage
@@ -206,7 +215,8 @@ con un flip-flop.
 \section{Tester unificato}
 \label{appendix:unitest}
 Per verificare il corretto funzionamento del componente, è stato realizzato un programma VHDL in grado di presentare all'UUT una RAM analoga a quella
-fornita col test di esempio, ma i cui valori possono essere aggiornati da parte di un process pilotato da un file di stimoli esterno.
+fornita col test di esempio, ma i cui valori possono essere aggiornati da parte di un process di controllo, a sua volta pilotato da un file di stimoli
+esterno.
 
 Per ogni linea del file sono specificati i segnali da inviare al componente (\lstinline{tb_reset} e \lstinline{tb_start}), i valori da scrivere in RAM
 (indirizzo e contenuto) e il tempo da attendere dopo ogni aggiornamento.\\
@@ -223,6 +233,9 @@ Per rendere più agevole la correzione dei difetti, il tester è in grado di sta
 \pagebreak
 \subsubsection{Implementazione del tester}
 \lstinputlisting[firstline=22,breaklines]{../RL1920.srcs/sim_1/new/unitest.vhd}
+
+\subsubsection{File di stimolo utilizzato}
+\lstinputlisting[numbers=none,breaklines]{../tests/electrosaint.pertini.txt}
 \pagebreak
 
 \section{Fuzzer}
@@ -231,15 +244,15 @@ Per rendere meno probabile la presenza di difetti non rilevati attraverso i test
 delle working-zones e un set appropriato di indirizzi col quale testare la funzionalità del componente.
 
 Il fuzzer è stato implementato nella forma di un semplice script Python che, dato in input un intero, restituisce in ouput un egual numero di
-``test runs``, dove una test run è una serie di linee di testo, nel formato utilizzato dal tester, che descrivono un caricamento di working-zones seguito
-da molteplici richieste di codifica, ognuna seguita dal corrispondente checkpoint.
+``test runs'', dove una test run è una serie di linee di testo nel formato utilizzato dal tester, le quali descrivono un caricamento di working-zones
+seguito da molteplici richieste di codifica, ognuna seguita a sua volta dal corrispondente checkpoint.
 
 La generazione dei test avviene rispettando le seguenti regole:
 \begin{enumerate}
     \item Le working-zones non devono sovrapporsi, e lo spazio indirizzato da ciascuna deve trovarsi all'interno dell'intervallo 0-127.
     \item Gli indirizzi 0, 1, 126 e 127 devono essere sempre visitati.
     \item Per ogni zona, detta $B$ la sua base, devono essere visitati gli indirizzi dell'intervallo $[B - 2, B + 6]$.
-    \item Ciascun indirizzo dev'essere visitato solo una volta.
+    \item Ciascun indirizzo dev'essere visitato una sola volta.
     \item Gli indirizzi da verificare devono essere visitati in ordine casuale.
 \end{enumerate}
 

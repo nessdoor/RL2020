@@ -24,10 +24,11 @@
 Il componente richiesto consiste in un \emph{working-zone encoder} per indirizzi a 7 bit, con output a 8 bit.\\
 Al primo segnale di \emph{start} dopo un \emph{reset}, il componente carica la lista di indirizzi base delle working-zones dalla memoria, disposte
 secondo la specifica fornita, e produce in uscita l'indirizzo letto in input, eventualmente codificato come richiesto. Un successivo segnale di
-\emph{start} porta il dispositivo a riutilizzare le working-zones precedentemente caricate per codificare il nuovo indirizzo in input. Nel caso in cui
+\emph{start} porta il dispositivo a riutilizzare le working-zones precedentemente caricate per codificare un nuovo indirizzo in input. Nel caso in cui
 dovesse giungere un segnale di \emph{reset} durante qualunque stadio della computazione, lo stato del dispositivo verrebbe reinizializzato e,
 successivamente, le working-zones ricaricate qualora un segnale \emph{start} alto dovesse venir rilevato.\\
-Si assume che il segnale di \emph{reset} proveniente dall'esterno sia opprtunamente filtrato e privo di glitch.
+Si assume che il segnale di \emph{reset} proveniente dall'esterno sia opportunamente filtrato e privo di glitch, e che le working-zones non si possano
+sovrapporre.
 
 \section{Architettura}
 \begin{figure}[ht]
@@ -70,17 +71,17 @@ dati di lavoro non appena disponibili, senza ulteriore orchestrazione da parte d
     \caption[Comparatore]{Schema di una unità comparatrice.\label{comparator}}
 \end{figure}
 
-L'encoder si collega direttamente alle memorie contenenti le basi delle working-zones\footnote{In realtà, i comparatori sono strettamente integrati con i
-registri di lavoro. Dal punto di vista del linguaggio di descrizione, infatti, fanno parte dello stesso modulo.} e ne dirige l'output verso 8 comparatori
-paralleli [\ref{comparator}].
-Tali comparatori verificano se l'indirizzo da codificare (memorizzato sul nono registro) cade all'interno della working-zone di propria competenza. Nel
-caso in cui ciò dovesse accadere, il comparatore della working-zone valida segnalerebbe sul bus \lstinline{active_zone} la propria attivazione.
+L'encoder si collega direttamente alle memorie contenenti le basi delle working-zones e ne dirige l'output verso 8 comparatori paralleli\footnote{In
+realtà, i comparatori sono strettamente integrati con i registri di lavoro. Dal punto di vista del linguaggio di descrizione, infatti, fanno parte dello
+stesso modulo.} [\ref{comparator}]. Tali comparatori verificano se l'indirizzo da codificare (memorizzato sul nono registro) cade all'interno della
+working-zone di propria competenza. Nel caso in cui ciò dovesse accadere, il comparatore della working-zone valida segnalerebbe sul bus
+\lstinline{active_zone} la propria attivazione.
 
 In seguito all'eventuale attivazione di una working-zone, un encoder ed un selettore si occupano di transcodificare il numero della working-zone attiva
-da one-hot a binario e di prelevare il suo indirizzo base, rispettivamente. L'indirizzo base viene poi portato agli ingressi di un sottrattore, che
-calcola l'offset dell'indirizzo da codificare rispetto alla base.
+da one-hot a binario e di prelevare il suo indirizzo base. L'indirizzo base viene poi portato agli ingressi di un sottrattore, che calcola l'offset
+dell'indirizzo da codificare rispetto alla base.
 
-Infine, l'offset viene decodificato in one-hot e concatenato all'altro sottocampo e al bit addizionale.
+Infine, l'offset viene decodificato in one-hot e concatenato all'identificatore della working-zone e al bit addizionale.
 
 Nel caso in cui nessuna working-zone dovesse risultare attiva, un semplice multiplexer devia l'indirizzo ricevuto in input direttamente verso l'output.
 
@@ -103,8 +104,8 @@ contribuisce alla determinazione dello stato successivo attraverso il calcolo de
     \item[S:] stato di riposo (sleep), dove la macchina permane in attesa di un nuovo segnale di inizio computazione. Nel caso in cui tale segnale dovesse
         sopraggiungere, la macchina transiterebbe nuovamente nello stato LA, evitando di ricaricare le working-zones.
 \end {description}
-Stato proprio e indirizzo corrente sono memorizzati da uno stesso process, funzionante in controfase con la memoria, il quale si occupa anche di di
-presentare il nuovo indirizzo all'uscita \lstinline{o_address}.
+Stato proprio e indirizzo corrente sono memorizzati dallo stesso process, funzionante in controfase con la memoria, che si occupa anche di di presentare
+il nuovo indirizzo all'uscita \lstinline{o_address}.
 
 \begin{figure}[ht]
     \includegraphics[scale=0.5]{reg_enabler.png}
@@ -138,8 +139,8 @@ Si riportano frammenti del report di sintesi per il componente.
 
 \subsection{Simulazioni}
 Per condurre le simulazioni in un regime simile a quello dell'ipotetico normale funzionamento, è stato creato un apposito programma di simulazione
-comandabile da file. Tale apparato di testing ha reso semplice non solo eseguire più attivazioni successive con indirizzi e working-zones diverse, ma anche
-la generazione automatica di test casuali per mezzo di un apposito fuzzer.
+comandabile da file. Tale apparato di testing ha reso semplice non solo l'esecuzione di più attivazioni successive con indirizzi e working-zones diverse, 
+ma anche la generazione automatica di test casuali per mezzo di un apposito fuzzer.
 
 Per i dettagli riguardanti il tester e il fuzzer, si rimanda alle appendici \ref{appendix:unitest} e \ref{appendix:fuzzer}.
 
@@ -175,8 +176,7 @@ Questo test controlla la correttezza nella rappresentazione degli indirizzi 0 e 
 siano. È un ulteriore test per la validazione dei comparatori e degli altri componenti algebrici.
 
 \paragraph{Partenza anticipata}
-Si è rimosso il ciclo di stasi dopo il segnale di reset per verificare che il funzionamento risulti corretto anche sotto vincoli di tempo più stringenti di
-quelli imposti nel test di riferimento.
+Il segnale di \emph{start} è inviato al componente prima del fronte di discesa del clock, verificando che ciò non alteri il comportamento della macchina.
 
 \paragraph{Reset durante la codifica}
 Test che tenta di produrre una criticità nella macchina di controllo inviando un segnale di reset durante la fase di ouput dell'indirizzo codificato (stato

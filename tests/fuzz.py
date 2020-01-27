@@ -100,6 +100,7 @@ if __name__ == '__main__':
 
         print(generate_input(inputs[-1]))
         print(generate_reset())
+        print(generate_pause())
         print(generate_start())
         print(generate_checkpoint(encode_address(wzs, inputs.pop())))
 

@@ -133,7 +133,7 @@ begin
                           '0';
     end generate;
 
-    -- Select the base of the active zone, if the current address is inisde one
+    -- Select the base of the active zone, if the current address is inside one
     with active_zone select
         base <= reg_bus(7 downto 0) when "00000001",
                 reg_bus(15 downto 8) when "00000010",
@@ -225,7 +225,7 @@ begin
             when LZ1 =>
                 nexs <= LZ2;
             when LZ2 =>
-                -- Start encoding when base addresses are loaded
+                -- Start encoding when base addresses have been loaded
                 if curr_mem_addr >= to_unsigned(7, 15) then
                     nexs <= LA;
                 else

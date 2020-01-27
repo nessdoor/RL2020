@@ -89,6 +89,11 @@ Nel caso in cui nessuna working-zone dovesse risultare attiva, un semplice multi
 Il controller si configura come una macchina a stati finiti, implementata da 3 process, accoppiata ad un elemento sequenziale per l'attivazione dei
 segnali di \emph{WE} dei registri di lavoro [\ref{reg_enabler}].
 
+\begin{figure}[hp]
+    \includegraphics[scale=0.5]{machine_states.png}
+    \caption[Stati della macchina di controllo]{Grafo degli stati della macchina di controllo.}
+\end{figure}
+
 L'FSM è una variante di una macchina di Moore i cui stati sono identificati da una coppia stato proprio-indirizzo corrente, e dove la funzione lambda
 contribuisce alla determinazione dello stato successivo attraverso il calcolo del prossimo indirizzo. Gli stati propri sono:
 \begin{description}

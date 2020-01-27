@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><!--Created with JFLAP 6.4.--><structure>
+	<type>moore</type>
+	<automaton>
+		<!--The list of states.-->
+		<state id="0" name="R">
+			<x>80.0</x>
+			<y>167.0</y>
+			<output>00-</output>
+		</state>
+		<state id="1" name="LZ1">
+			<x>282.0</x>
+			<y>167.0</y>
+			<output>010</output>
+		</state>
+		<state id="2" name="LZ2">
+			<x>486.0</x>
+			<y>170.0</y>
+			<output>010</output>
+		</state>
+		<state id="3" name="LA">
+			<x>633.0</x>
+			<y>280.0</y>
+			<output>010</output>
+		</state>
+		<state id="4" name="WA">
+			<x>576.0</x>
+			<y>429.0</y>
+			<output>011</output>
+		</state>
+		<state id="5" name="D">
+			<x>398.0</x>
+			<y>429.0</y>
+			<output>10-</output>
+		</state>
+		<state id="6" name="S">
+			<x>326.0</x>
+			<y>280.0</y>
+			<output>00-</output>
+		</state>
+		<!--The list of transitions.-->
+		<transition>
+			<from>2</from>
+			<to>1</to>
+			<controlx>378</controlx>
+			<controly>233</controly>
+			<read>curr_mem_addr &lt; 7</read>
+			<transout>010</transout>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<controlx>382</controlx>
+			<controly>88</controly>
+			<read>-</read>
+			<transout>010</transout>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>3</to>
+			<read>curr_mem_addr &gt;= 7</read>
+			<transout>010</transout>
+		</transition>
+		<transition>
+			<from>5</from>
+			<to>6</to>
+			<read>i_start = 0</read>
+			<transout>00-</transout>
+		</transition>
+		<transition>
+			<from>6</from>
+			<to>3</to>
+			<read>i_start = 1</read>
+			<transout>010</transout>
+		</transition>
+		<transition>
+			<from>4</from>
+			<to>5</to>
+			<read>-</read>
+			<transout>10-</transout>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>i_start = 1</read>
+			<transout>010</transout>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>4</to>
+			<read>-</read>
+			<transout>011</transout>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>0</to>
+			<read>i_start = 0</read>
+			<transout>00-</transout>
+		</transition>
+		<transition>
+			<from>6</from>
+			<to>6</to>
+			<controlx>333</controlx>
+			<controly>227</controly>
+			<read>i_start = 0</read>
+			<transout>00-</transout>
+		</transition>
+		<transition>
+			<from>5</from>
+			<to>5</to>
+			<controlx>398</controlx>
+			<controly>558</controly>
+			<read>i_start = 1</read>
+			<transout>10-</transout>
+		</transition>
+	</automaton>
+</structure>
